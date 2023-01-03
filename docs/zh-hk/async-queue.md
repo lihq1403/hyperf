@@ -24,7 +24,7 @@ composer require hyperf/async-queue
 |  handle_timeout  |    int    |                     10                      |            消息處理超時時間             |
 |    processes     |    int    |                      1                      |               消費進程數                |
 | concurrent.limit |    int    |                      1                      |             同時處理消息數              |
-|   max_messages   |    int    |                      0                      | 進程重啟所需最大處理的消息數 默認不重啟 |
+|   max_messages   |    int    |                      0                      | 進程重啓所需最大處理的消息數 默認不重啓 |
 
 ```php
 <?php
@@ -66,15 +66,15 @@ return [
 
 ## 工作原理
 
-`ConsumerProcess` 是異步消費進程，會根據用户創建的 `Job` 或者使用 `@AsyncQueueMessage` 的代碼塊，執行消費邏輯。
-`Job` 和 `@AsyncQueueMessage` 都是需要投遞和執行的任務，即數據、消費邏輯都會在任務中定義。
+`ConsumerProcess` 是異步消費進程，會根據用户創建的 `Job` 或者使用 `#[AsyncQueueMessage]` 的代碼塊，執行消費邏輯。
+`Job` 和 `#[AsyncQueueMessage]` 都是需要投遞和執行的任務，即數據、消費邏輯都會在任務中定義。
 
 - `Job` 類中成員變量即為待消費的數據，`handle()` 方法則為消費邏輯。
-- `@AsyncQueueMessage` 註解的方法，構造函數傳入的數據即為待消費的數據，方法體則為消費邏輯。
+- `#[AsyncQueueMessage]` 註解的方法，構造函數傳入的數據即為待消費的數據，方法體則為消費邏輯。
 
 ```mermaid
 graph LR;
-A[服務啟動]-->B[異步消費進程啟動]
+A[服務啓動]-->B[異步消費進程啓動]
 B-->C[監聽隊列]
 D[投遞任務]-->C
 C-->F[消費任務]
@@ -121,7 +121,7 @@ class AsyncQueueConsumer extends ConsumerProcess
 
 這種模式會把對象直接序列化然後存到 `Redis` 等隊列中，所以為了保證序列化後的體積，儘量不要將 `Container`，`Config` 等設置為成員變量。
 
-比如以下 `Job` 的定義，是 **不可取** 的，同理 `@Inject` 也是如此。
+比如以下 `Job` 的定義，是 **不可取** 的，同理 `#[Inject]` 也是如此。
 
 > 因為 Job 會被序列化，所以成員變量不要包含 匿名函數 等 無法被序列化 的內容，如果不清楚哪些內容無法被序列化，儘量使用註解方式。
 
@@ -350,7 +350,7 @@ class QueueController extends AbstractController
 
 ### QueueLengthListener
 
-框架自帶了一個記錄隊列長度的監聽器，默認不開啟，您如果需要，可以自行添加到 `listeners` 配置中。
+框架自帶了一個記錄隊列長度的監聽器，默認不開啓，您如果需要，可以自行添加到 `listeners` 配置中。
 
 ```php
 <?php
@@ -364,8 +364,8 @@ return [
 
 ### ReloadChannelListener
 
-當消息執行超時，或項目重啟導致消息執行被中斷，最終都會被移動到 `timeout` 隊列中，只要您可以保證消息執行是冪等的（同一個消息執行一次，或執行多次，最終表現一致），
-就可以開啟以下監聽器，框架會自動將 `timeout` 隊列中消息移動到 `waiting` 隊列中，等待下次消費。
+當消息執行超時，或項目重啓導致消息執行被中斷，最終都會被移動到 `timeout` 隊列中，只要您可以保證消息執行是冪等的（同一個消息執行一次，或執行多次，最終表現一致），
+就可以開啓以下監聽器，框架會自動將 `timeout` 隊列中消息移動到 `waiting` 隊列中，等待下次消費。
 
 > 監聽器監聽 `QueueLength` 事件，默認執行 500 次消息後觸發一次。
 

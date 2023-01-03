@@ -1,37 +1,39 @@
-# v3.0.0 - TBD
+# v3.0.1 - TBD
+
+# v3.0.0 - 2023-01-03
 
 - [#4238](https://github.com/hyperf/hyperf/issues/4238) Upgraded the minimum php version to `^8.0` for all components;
 - [#5087](https://github.com/hyperf/hyperf/pull/5087) Support PHP 8.2;
 
 ## BC breaks
 
-- 框架移除了 `@Annotation` 的支持，全部使用 `PHP8` 原生注解 `Attribute`，更新前务必检查项目中，是否已经全部替换为 `Attribute`。
+- The framework removes `@Annotation` support, and uses `PHP8` native annotation `Attribute`. Before updating, be sure to check whether the project has been replaced by `Attribute`.
 
-可以执行以下脚本，将 `Doctrine Annotations` 转化为 `PHP8 Attributes`.
+The following script can be executed to convert `Doctrine Annotations` to `PHP8 Attributes`.
 
-**注意: 这个脚本只能在 2.2 版本下执行**
+**Note: This script can only be executed under version 2.2**
 
 ```shell
 composer require hyperf/code-generator
 php bin/hyperf.php code:generate -D app
 ```
 
-- 升级模型脚本
+- Database Model upgrade script
 
-> 因为模型基类增加了成员变量的类型支持，所以需要使用以下脚本，将其升级为新版本。
+> Because the model base class has added type support for member variables, you need to use the following script to upgrade it to a new version.
 
 ```shell
 composer require hyperf/code-generator
 php vendor/bin/regenerate-models.php $PWD/app/Model
 ```
 
-- 框架为类库增加了更多的类型限制，所以从 `2.2` 更新到 `3.0` 版本时，需要跑一遍静态检测。
+- The framework adds more type restrictions to the class library, so when updating from `2.2` to `3.0`, you need to run a static check to make sure it is works.
 
 ```shell
-composer analyse
+composer analysis
 ```
 
-- 框架根据 `GRPC` 规范修改了 `GRPC Server` 返回的 `Http status` 固定为为 200， `GRPC Server` 返回对应的 `status code`,更新前如果有使用 `GRPC`,请务必将相关的服务升级到 3.x 版本
+- The framework modifies the `Http status` returned by `gRPC Server` according to the `gRPC` specification. It is fixed at 200, and `gRPC Server` returns the corresponding `status code`. Service upgrade to version 3.x
 
 ## Dependencies Upgrade
 
@@ -69,6 +71,8 @@ composer analyse
 - [#5206](https://github.com/hyperf/hyperf/pull/5206) Support the transformation of object type to AST nodes.
 - [#5211](https://github.com/hyperf/hyperf/pull/5211) Added Annotation `CacheAhead` which used to cache data ahead.
 - [#5227](https://github.com/hyperf/hyperf/pull/5227) Added `Hyperf\WebSocketServer\Sender::getResponses()`.
+- [#5250](https://github.com/hyperf/hyperf/pull/5250) Added `defer_release` config in `hyperf/db`
+- [#5261](https://github.com/hyperf/hyperf/pull/5261) Added requirement `ext-posix` for `watcher`.
 
 ## Optimized
 
@@ -171,7 +175,10 @@ composer analyse
 - [#5100](https://github.com/hyperf/hyperf/pull/5100) Fixed bug that the tag `continue` cannot work when using `view-engine`.
 - [#5121](https://github.com/hyperf/hyperf/pull/5121) Fixed bug that the SQL is not valid but the correct error message cannot be obtained when using `pgsql`.
 - [#5132](https://github.com/hyperf/hyperf/pull/5132) Fixed bug that the exit code of command does not work when the exception code isn't int.
+- [#5142](https://github.com/hyperf/hyperf/pull/5142) Fixed bug that the method `Request::parseHost` does not work when host is invalid.
 - [#5199](https://github.com/hyperf/hyperf/pull/5199) Fixed bug that `RedisSentinel` can't support empty password.
 - [#5221](https://github.com/hyperf/hyperf/pull/5221) Fixed bug that `PGSqlSwooleConnection::affectingStatement()` can't work when the `sql` is wrong.
 - [#5223](https://github.com/hyperf/hyperf/pull/5223) Fixed bug that `KeepaliveConnection::isTimeout()` can't work when using swow.
 - [#5229](https://github.com/hyperf/hyperf/pull/5229) Fixed bug that proxy class will be generated failed when using parameters who allow null in constructor.
+- [#5252](https://github.com/hyperf/hyperf/pull/5252) Fixed bug that generate rpc-client failed when the interface has parent interfaces.
+- [#5268](https://github.com/hyperf/hyperf/pull/5268) Fixed bug that abstract methods will be written by `di`.
